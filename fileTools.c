@@ -3,6 +3,7 @@
 #include <string.h>
 #include <libgen.h>
 #include <sys/stat.h>
+#include "encryption.c"
 
 int copy(const char* copyFrom, const char* copyTo);
 int fileExists(const char* fileName);
@@ -27,7 +28,7 @@ int main(int argc, char const *argv[])
 
   char arg = argv[1][1];
   const char *fileMain = argv[2];
-
+  
   switch (arg)
   {
   case 'D': // Delete File

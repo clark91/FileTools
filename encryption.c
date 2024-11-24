@@ -127,37 +127,48 @@ int encrypt(char* fileName){
 }
 
 int decrypt(char* fileName){
-  unsigned char salt[16];
-  char key[16];
-
   FILE *file = fopen(fileName, "rb");
   fseek(file, 0, SEEK_END);
   size_t fileSize = ftell(file);
   rewind(file);
 
-  char *fileBuf = malloc(fileSize * sizeof(char));
-  fread(fileBuf, fileSize, 1, file);
+  if(fileSize < 16){
+    printf("File cannot be decrypted\n");
+    return 1;
+  }
+
+  char salt[16];
+  char salt_hex[33];
+  fread(salt, 1, 16, file);
+
+  to_hex_string(salt, 16, salt_hex);
+  printf("%s\n", salt_hex);
+
+  char key[16];
+  keyGen(salt, key);
+
+  char *fileBuf = malloc((fileSize - 16) * sizeof(char));
+  char *outBuf = malloc((fileSize - 16) * sizeof(char));
+
+  fread(fileBuf, 1, fileSize - 16, file);
   fclose(file);
 
-  printf("FILE: %s \n", fileBuf);
+  fileBuf[fileSize -16] = '\0';
+  printf("%s\n", fileBuf);
 
-  strncpy(salt, fileBuf, 16);
-  printf("SALT: %s\n", salt);
-  keyGen(key, salt);
-  printf("SALT: %s\n", salt);
-
-  printf("Key used: %s \n", key);
-  printf("Salt used: %s \n", salt);
-
-  char *outBuf = malloc((fileSize - 16) * sizeof(char));
-  printf("Content: %s\n", fileBuf + 16);
-  for (int i = 16; i < fileSize; i++){
-    printf("%d : %c ^ %c = %c\n", i - 16, fileBuf[i], key[i % 16], fileBuf[i] ^ key[i % 16]);
-    outBuf[i-16] = fileBuf[i] ^ key[i % 16];
+  for (int i = 0; i < fileSize - 16; i++){
+    printf("%d : %c ^ %c = %c\n", i, fileBuf[i], key[i % 16], fileBuf[i] ^ key[i % 16]);
+    outBuf[i] = fileBuf[i] ^ key[i % 16];
   }
-  outBuf[fileSize - 16] = '\0';
 
+  outBuf[fileSize - 16] = '\0';
   printf("%s\n", outBuf);
 
+  file = fopen(fileName, "wb");
+  fprintf(file, "%s", outBuf);
+  fclose(file);
+
+  free(fileBuf);
+  free(outBuf);
   return 0;
 }

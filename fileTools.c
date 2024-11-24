@@ -18,13 +18,13 @@ int deleteLine(const char* fileName, int line);
 int countLines(const char* fileName);
 void displayHelp();
 int compareFiles(const char* fileName1, const char* fileName2);
-
+/*
 int main(int argc, char const *argv[])
 {
-  /*if (argc < 3){ // Ensuring the correct number of arguments is given.
+  if (argc < 3){ // Ensuring the correct number of arguments is given.
     printf("Expecting at least 2 arguments\n");
     return 1;
-  }*/
+  }
 
   char arg = argv[1][1];
   const char *fileMain = argv[2];
@@ -95,6 +95,52 @@ int main(int argc, char const *argv[])
 
   return 0;
 }
+*/
+
+int main(int argc, char const *argv[])
+{
+  if (strncmp(argv[1], "-cpy", 4) == 0){
+    if (argc < 4){
+      printf("Expecting 2 Files for Copy function \n");
+      return 1;
+    }
+    copy(argv[2], argv[3]);
+  } else if (strncmp(argv[1], "-df", 3) == 0){
+    deleteFile(argv[2]);
+  } else if (strncmp(argv[1], "-N", 2) == 0){
+    makeFile(argv[2]);
+  } else if (strncmp(argv[1], "-o", 2) == 0){
+    readFile(argv[2]);
+  } else if (strncmp(argv[1], "-a", 2) == 0){
+    append(argv[2], argv[3]);
+  } else if (strncmp(argv[1], "-i", 2) == 0){
+    insert(argv[2], atoi(argv[3]), argv[4]);
+  } else if (strncmp(argv[1], "-rl", 3) == 0){
+    showLine(argv[2], atoi(argv[3]));
+  } else if (strncmp(argv[1], "-dl", 3) == 0){
+    deleteLine(argv[2], atoi(argv[3]));
+  } else if (strncmp(argv[1], "-cl", 3) == 0){
+    countLines(argv[2]);
+  } else if (strncmp(argv[1], "-h", 2) == 0){
+    displayHelp();
+  } else if (strncmp(argv[1], "-r", 2) == 0){
+    if (copy(argv[2], argv[3]) == 0)
+      deleteFile(argv[2]);
+  } else if (strncmp(argv[1], "-cmp", 4) == 0){
+    compareFiles(argv[2], argv[3]);
+  } else if (strncmp(argv[1], "-enc", 4) == 0){
+    encrypt((char* )argv[2]);
+  } else if (strncmp(argv[1], "-dec", 4) == 0){
+    decrypt((char*)argv[2]);
+  } else {
+    printf("Incorrect argument. Type -h for help\n");
+  }
+
+  
+
+  return 0;
+}
+
 
 int max(int a, int b) {
     if (a > b) {
@@ -358,10 +404,11 @@ int countLines(const char* fileName){
 }
 
 void displayHelp(){
-  printf(" -n <File Name> : creates a new file\n -C <File to copy from> <File to copy to> : copy file\n -D <File Name> : Deletes the file \n -o <File Name> : Displays the content of the file \n "
-  "-a <File Name> <Text> : Appends the text to the end of the specified file \n -d <File Name> <Line number> : Deletes the specified line from the file \n -i <File Name> <Line> <Text> : Inserts the text into the specified line of the file\n "
-  "-s <File Name> <Line> : Displays the content of the specific line of a file.\n log : Displays a log of all recent operations peformed on files.\n -l <File Name> : Prints the number in the file \n "
-  "-r <Old File Name> <New File Name> : Renames a file from its old name to its new name \n -c <File 1> <File2> : Compares two files and checks if they are identical\n");
+  printf(" -N <File Name> : creates a new file\n -cpy <File to copy from> <File to copy to> : copy file\n -df <File Name> : Deletes the file \n -o <File Name> : Displays the content of the file \n "
+  "-a <File Name> <Text> : Appends the text to the end of the specified file \n -dl <File Name> <Line number> : Deletes the specified line from the file \n -i <File Name> <Line> <Text> : Inserts the text into the specified line of the file\n "
+  "-rl <File Name> <Line> : Displays the content of the specific line of a file.\n -cl <File Name> : Prints the number in the file \n "
+  "-r <Old File Name> <New File Name> : Renames a file from its old name to its new name \n -cmp <File 1> <File2> : Compares two files and checks if they are identical\n "
+  "-enc <File Name> : Encrypts the file\n -dec <File Name> : Decrypts the file\n");
 }
 
 // This compares two files and checks whether or not they are identical

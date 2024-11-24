@@ -1,4 +1,3 @@
-//#include "fileTools.c"
 #include <string.h>
 
 #include <openssl/evp.h>
@@ -9,17 +8,6 @@ int keyGen(unsigned char salt[], char* out);
 int keyGenNoSalt(char* outKey, char* outSalt);
 int encrypt(char* fileName);
 int decrypt(char* fileName);
-
-int main(int argc, char const *argv[]){
-  char *fileName = "test.txt";
-  if(!strcmp(argv[1], "e")){
-    printf("Encrypt\n");
-    encrypt(fileName);
-  } else if (!strcmp(argv[1], "d")){
-    printf("Decrypt\n");
-    decrypt(fileName);
-  }
-}
 
 void to_hex_string(const unsigned char *data, size_t len, char *out) {
     for (size_t i = 0; i < len; i++) {
@@ -51,7 +39,7 @@ int keyGen(unsigned char salt[16], char* out){
   to_hex_string(key, key_len, key_hex);
   to_hex_string(salt, salt_len, salt_hex);
 
-  printf("Key: %s\nSalt: %s\n", key_hex, salt_hex);
+  //printf("Key: %s\nSalt: %s\n", key_hex, salt_hex);
   strncpy(out, key, 16);
 
   return 0;
@@ -98,14 +86,10 @@ int encrypt(char* fileName){
   }
   encBuf[fileSize] = '\0';
 
-  printf("Key used: %s \n", key);
-  printf("Salt used: %s \n", salt);
-  // Reverse Test
-  for (int i = 0; i < fileSize; i++){
-    printf("%c\n", encBuf[i] ^ key[i % 16]);
-  }
-
-  printf("Output: %s \n", encBuf);
+  // Used for Debugging
+  //printf("Key used: %s \n", key);
+  //printf("Salt used: %s \n", salt);
+  //printf("Output: %s \n", encBuf);
 
   // Creates a final buffer with the encrypted message and the salt used.
   char *outputBuf = malloc((fileSize + 16) * sizeof(char));
@@ -123,6 +107,11 @@ int encrypt(char* fileName){
   free(encBuf);
   free(outputBuf);
   printf("%s Successfully encrypted\n", fileName);
+
+  FILE *logFile = fopen("log", "a"); 
+  fprintf(logFile, "Encrypted file %s\n", fileName);  
+  fclose(logFile);
+
   return 0;
 }
 
@@ -141,9 +130,6 @@ int decrypt(char* fileName){
   char salt_hex[33];
   fread(salt, 1, 16, file);
 
-  to_hex_string(salt, 16, salt_hex);
-  printf("%s\n", salt_hex);
-
   char key[16];
   keyGen(salt, key);
 
@@ -152,17 +138,12 @@ int decrypt(char* fileName){
 
   fread(fileBuf, 1, fileSize - 16, file);
   fclose(file);
-
   fileBuf[fileSize -16] = '\0';
-  printf("%s\n", fileBuf);
 
   for (int i = 0; i < fileSize - 16; i++){
-    printf("%d : %c ^ %c = %c\n", i, fileBuf[i], key[i % 16], fileBuf[i] ^ key[i % 16]);
     outBuf[i] = fileBuf[i] ^ key[i % 16];
   }
-
   outBuf[fileSize - 16] = '\0';
-  printf("%s\n", outBuf);
 
   file = fopen(fileName, "wb");
   fprintf(file, "%s", outBuf);
@@ -170,5 +151,10 @@ int decrypt(char* fileName){
 
   free(fileBuf);
   free(outBuf);
+
+  FILE *logFile = fopen("log", "a"); 
+  fprintf(logFile, "Decrypted file %s\n", fileName);  
+  fclose(logFile);
+
   return 0;
 }

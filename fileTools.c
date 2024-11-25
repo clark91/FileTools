@@ -54,6 +54,9 @@ int main(int argc, char const *argv[])
     encrypt((char* )argv[2]);
   } else if (strncmp(argv[1], "-dec", 4) == 0){
     decrypt((char*)argv[2]);
+  } else if (strncmp(argv[1], "-log", 4) == 0){
+    if (fileExists("log.txt") == 1)
+      readFile("log.txt");
   } else {
     printf("Incorrect argument. Type -h for help\n");
   }
@@ -333,7 +336,7 @@ void displayHelp(){
   "-a <File Name> <Text> : Appends the text to the end of the specified file \n -dl <File Name> <Line number> : Deletes the specified line from the file \n -i <File Name> <Line> <Text> : Inserts the text into the specified line of the file\n "
   "-rl <File Name> <Line> : Displays the content of the specific line of a file.\n -cl <File Name> : Prints the number in the file \n "
   "-r <Old File Name> <New File Name> : Renames a file from its old name to its new name \n -cmp <File 1> <File2> : Compares two files and checks if they are identical\n "
-  "-enc <File Name> : Encrypts the file\n -dec <File Name> : Decrypts the file\n");
+  "-enc <File Name> : Encrypts the file\n -dec <File Name> : Decrypts the file\n -log : Displays the log of operations\n");
 }
 
 int compareFiles(const char* fileName1, const char* fileName2){

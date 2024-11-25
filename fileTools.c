@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
   } else if (strncmp(argv[1], "-dl", 3) == 0){
     deleteLine(argv[2], atoi(argv[3]));
   } else if (strncmp(argv[1], "-cl", 3) == 0){
-    countLines(argv[2]);
+    printf("%s contains %d lines\n", argv[1], countLines(argv[2]));
   } else if (strncmp(argv[1], "-h", 2) == 0){
     displayHelp();
   } else if (strncmp(argv[1], "-r", 2) == 0){
@@ -63,7 +63,6 @@ int main(int argc, char const *argv[])
   return 0;
 }
 
-
 int max(int a, int b) {
     if (a > b) {
         return a;
@@ -72,7 +71,6 @@ int max(int a, int b) {
     }
 }
 
-// The function for copying the contents of one file to another
 int copy(const char* copyFrom, const char* copyTo){
 
   // Checks that the file to copy exists and that you aren't overwriting a file by copying
@@ -110,9 +108,9 @@ int copy(const char* copyFrom, const char* copyTo){
   free(fileBuffer);
 
   // Writes the user's operations to a log file.
-  FILE *logFile = fopen("log", "a"); 
-  fprintf(logFile, "Successfully Copied %s to %s \n", copyFrom, copyTo);
-  printf("Successfully Copied %s to %s \n", copyFrom, copyTo);
+  FILE *logFile = fopen("log.txt", "a"); 
+  fprintf(logFile,"Successfully Copied %d lines from %s to %s \n", countLines(copyFrom), copyFrom, copyTo);
+  printf("Successfully Copied %d lines from %s to %s \n", countLines(copyFrom), copyFrom, copyTo);
   fclose(logFile);
   return 0;
 }
@@ -141,8 +139,8 @@ int makeFile(const char* fileName){
       printf("Successfully created file: %s\n", fileName);
 
       // If it is correctly created the operation is appended to the log file
-      FILE *logFile = fopen("log", "a"); 
-      fprintf(logFile, "Successfully created file: %s\n", fileName);  
+      FILE *logFile = fopen("log.txt", "a"); 
+      fprintf(logFile, "Successfully created file: %s with %d lines\n", fileName, countLines(fileName));  
       fclose(logFile);
 
       return 1;
@@ -158,7 +156,7 @@ int deleteFile(const char* fileName){
   if (fileExists(fileName)){
     remove(fileName);
     
-    FILE *logFile = fopen("log", "a"); 
+    FILE *logFile = fopen("log.txt", "a"); 
     fprintf(logFile, "File deleted: %s\n", fileName);  
     fclose(logFile);
 
@@ -194,8 +192,8 @@ int append(const char* fileName, const char* text){
     fclose(file);
     
     // Log append operation
-    FILE *logFile = fopen("log", "a"); 
-    fprintf(logFile, "Appended following text to %s: %s\n", fileName, text);  
+    FILE *logFile = fopen("log.txt", "a"); 
+    fprintf(logFile, "Appended following text to %s: %s. There are now %d lines\n", fileName, text, countLines(fileName));  
     fclose(logFile);
 
     return 1;
@@ -237,8 +235,8 @@ int insert(const char* fileName, int line, const char* text){
     fclose(file);
     
     // Logs the operation
-    FILE *logFile = fopen("log", "a"); 
-    fprintf(logFile, "Inserted the following text at line %d of %s: %s\n", line, fileName, text);  
+    FILE *logFile = fopen("log.txt", "a"); 
+    fprintf(logFile, "Inserted the following text at line %d of %s: %s\nThere are now %d lines", line, fileName, text, countLines(fileName));  
     fclose(logFile);
 
 
@@ -296,8 +294,8 @@ int deleteLine(const char* fileName, int line){
     fprintf(file, "%s", fileBuf);
     fclose(file);
     
-    FILE *logFile = fopen("log", "a"); 
-    fprintf(logFile, "Line %d deleted from %s\n", line, fileName);  
+    FILE *logFile = fopen("log.txt", "a"); 
+    fprintf(logFile, "Line %d deleted from %s. There are now %d lines\n", line, fileName, countLines(fileName));  
     fclose(logFile);
 
 
@@ -312,17 +310,22 @@ int countLines(const char* fileName){
   FILE *file = fopen(fileName, "r");
   if (file == NULL) {
     printf("Could not find file\n");
-    return 2;
+    return -1;
   }
-
+  
+  size_t fileSize = 0;
   // Iterates through each line in the file and increments the counter until it reaches the end of the file
   int count = 0;
-  for (char c = getc(file); c != EOF; c = getc(file))
-        if (c == '\n') 
-            count = count + 1;
+  for (char c = getc(file); c != EOF; c = getc(file)){
+    fileSize ++;
+    if (c == '\n') 
+      count = count + 1;
+  }
+    
   
-  printf("%s contains %d lines \n", fileName, count);
   fclose(file);
+
+  return fileSize == 0 ? 0 : count + 1;
 }
 
 void displayHelp(){
@@ -333,7 +336,6 @@ void displayHelp(){
   "-enc <File Name> : Encrypts the file\n -dec <File Name> : Decrypts the file\n");
 }
 
-// This compares two files and checks whether or not they are identical
 int compareFiles(const char* fileName1, const char* fileName2){
   FILE *f1 = fopen(fileName1, "r");
   FILE *f2 = fopen(fileName2, "r");

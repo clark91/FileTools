@@ -9,6 +9,7 @@ int keyGenNoSalt(char* outKey, char* outSalt);
 int encrypt(char* fileName);
 int decrypt(char* fileName);
 
+// Converts a string of bytes into hex (Used for debugging primarily)
 void to_hex_string(const unsigned char *data, size_t len, char *out) {
     for (size_t i = 0; i < len; i++) {
         sprintf(out + (i * 2), "%02x", data[i]);  
@@ -16,28 +17,24 @@ void to_hex_string(const unsigned char *data, size_t len, char *out) {
     out[len * 2] = '\0';  
 }
 
+// A function to generate a 128 bit key from a password and a salt
 int keyGen(unsigned char salt[16], char* out){
 
-  //unsigned char salt[16];
+  // Takes in a password of up to 256 B 
   char password[256];
   printf("Enter Password: ");
   scanf("%s", password);
  
+  // Constants for the PBKDF2 function
+  const int iterations = 100000;
+  const int key_len = 16;
+  const int salt_len = 16;
 
-  int iterations = 100000;
-  int key_len = 16;
-  int salt_len = 16;
-
+  // The Hashing type used (in this case sha256)
   const EVP_MD *hash_function = EVP_sha256();
 
   char key[key_len];
   PKCS5_PBKDF2_HMAC(password, strlen(password), salt,salt_len, iterations, hash_function, key_len, key);
-
-  char key_hex[key_len * 2 + 1];
-  char salt_hex[salt_len * 2 + 1];
-
-  to_hex_string(key, key_len, key_hex);
-  to_hex_string(salt, salt_len, salt_hex);
 
   //printf("Key: %s\nSalt: %s\n", key_hex, salt_hex);
   strncpy(out, key, 16);
@@ -45,7 +42,10 @@ int keyGen(unsigned char salt[16], char* out){
   return 0;
 }
 
+// Generates the 128 bit key from a password and generates a salt
 int keyGenNoSalt(char *outKey, char *outSalt){
+
+  // Generates a salt of 16 random bytes 
   unsigned char salt[16];
   if (!RAND_bytes(salt, sizeof(salt))) {
     fprintf(stderr, "Error generating salt.\n");
@@ -55,8 +55,8 @@ int keyGenNoSalt(char *outKey, char *outSalt){
   char key[16];
   keyGen(salt, key);
 
-  strncpy(outKey, key, 16);
-  strncpy(outSalt, salt, 16);
+  memcpy(outKey, key, 16);
+  memcpy(outSalt, salt, 16);
   return 0;
 }
 
@@ -115,6 +115,7 @@ int encrypt(char* fileName){
   return 0;
 }
 
+// XOR decryption 
 int decrypt(char* fileName){
   FILE *file = fopen(fileName, "rb");
   fseek(file, 0, SEEK_END);
@@ -158,3 +159,4 @@ int decrypt(char* fileName){
 
   return 0;
 }
+

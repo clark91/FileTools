@@ -1,2 +1,2 @@
-fileTools: fileTools.c encryption.c
-	gcc -o fileTools fileTools.c -lcrypto
+fileTools: Main.c encryption.c operations.c
+	gcc -o fileTools Main.c -lcrypto

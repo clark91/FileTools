@@ -87,7 +87,8 @@ int encrypt(char* fileName){
   outputBuf[fileSize + 16] = '\0';
 
   file = fopen(fileName, "wb");
-  fprintf(file, "%s", outputBuf);
+  //fprintf(file, "%s", outputBuf);
+  fwrite(outputBuf, 1, fileSize + 16, file);
   fclose(file);
 
   free(fileBuf);
@@ -138,7 +139,8 @@ int decrypt(char* fileName){
   outBuf[fileSize - 16] = '\0';
 
   file = fopen(fileName, "wb");
-  fprintf(file, "%s", outBuf);
+  //fprintf(file, "%s", outBuf);
+  fwrite(outBuf, 1, fileSize - 16, file);
   fclose(file);
 
   free(fileBuf);

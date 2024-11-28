@@ -37,7 +37,7 @@ int copy(const char* copyFrom, const char* copyTo){
     return 1;
   }
 
-  FILE *copyFile = fopen(copyFrom, "r");
+  FILE *copyFile = fopen(copyFrom, "rb");
   fseek(copyFile, 0L, SEEK_END);
   int fileSize = ftell(copyFile);
   rewind(copyFile);
@@ -55,8 +55,9 @@ int copy(const char* copyFrom, const char* copyTo){
   fclose(copyFile);
 
   // Writes the Buffer into a new file of the name specified by the user
-  FILE *targetFile = fopen(copyTo, "w");
-  fprintf(targetFile, "%s", fileBuffer);
+  FILE *targetFile = fopen(copyTo, "wb");
+  //fprintf(targetFile, "%s", fileBuffer);
+  fwrite(fileBuffer, 1, fileSize, targetFile);
   fclose(targetFile);
   free(fileBuffer);
 

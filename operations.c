@@ -283,7 +283,7 @@ int countLines(const char* fileName){
 }
 
 void displayHelp(){
-  printf(" -N <File Name> : creates a new file\n -cpy <File to copy from> <File to copy to> : copy file\n -df <File Name> : Deletes the file \n -o <File Name> : Displays the content of the file \n "
+  printf(" -n <File Name> : creates a new file\n -cpy <File to copy from> <File to copy to> : copy file\n -df <File Name> : Deletes the file \n -o <File Name> : Displays the content of the file \n "
   "-a <File Name> <Text> : Appends the text to the end of the specified file \n -dl <File Name> <Line number> : Deletes the specified line from the file \n -i <File Name> <Line> <Text> : Inserts the text into the specified line of the file\n "
   "-rl <File Name> <Line> : Displays the content of the specific line of a file.\n -cl <File Name> : Prints the number in the file \n "
   "-r <Old File Name> <New File Name> : Renames a file from its old name to its new name \n -cmp <File 1> <File2> : Compares two files and checks if they are identical\n "
@@ -325,10 +325,10 @@ int compareFiles(const char* fileName1, const char* fileName2){
   free(line2);
 
   if (differences != 0){
-    printf("These files have differences on %d lines\n", differences);
+    printf("%s and %s have differences on %d lines\n", fileName1, fileName2, differences);
     return 1;
   }
 
-  printf("These files are identical\n");
+  printf("%s and %s are identical\n", fileName1,fileName2);
   return 0;
 }
